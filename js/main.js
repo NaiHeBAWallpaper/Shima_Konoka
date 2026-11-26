@@ -10,6 +10,8 @@ let loadingResolution;
 let spineData;
 
 let customScale = 1;
+let positionX = 0;
+let positionY = 0;
 let targetFps = 60;
 let bgmfile = './assets/audio/0k@eri.flac';
 let bgmvolume = 0;
@@ -33,7 +35,17 @@ let flipped = false;
 let transpose = 1;
 
 let currentTracks = []; // 跟踪当前播放的音频
-window.selectedLanguage = 'Japanese'; // 全局语言变量（挂载到window对象）
+let interfaceLanguage = 'default';
+let steamLanguage = '';
+let subtitleLanguagePreference = 'auto';
+window.selectedLanguage = 'English';
+const subtitleLocales = {
+	English: 'en',
+	Chinese: 'zh-Hans',
+	TraditionalChinese: 'zh-Hant',
+	Japanese: 'ja',
+	Korean: 'ko'
+};
 let isVoicelinePlaying = false;
 
 const CHARACTER = 'CH0264';
@@ -56,6 +68,14 @@ const AUDIO_DETAIL = [
             Chinese: [
                 "啊啊，浑身湿透了……",
                 "呜……好冷。"
+            ],
+            TraditionalChinese: [
+                "啊啊，渾身溼透了……",
+                "嗚……好冷。"
+            ],
+            Korean: [
+                "아, 젖어있어요...",
+                "너무 추워요"
             ]
         }
     },
@@ -72,6 +92,14 @@ const AUDIO_DETAIL = [
             Chinese: [
                 "开始下雨了。好像会下一晚……唉……",
                 "不过，倒是正好让脑袋冷静下来了呢。"
+            ],
+            TraditionalChinese: [
+                "開始下雨了。好像會下一晚……唉……",
+                "不過，倒是正好讓腦袋冷靜下來了呢。"
+            ],
+            Korean: [
+                "정말 비가 내리기 시작했는데 오늘 밤까지만 멈추지 않을 거라고요",
+                "제 머릿속을 차분하게 하는 좋은 방법인 것 같아요"
             ]
         }
     },
@@ -91,6 +119,16 @@ const AUDIO_DETAIL = [
                 "哼？啊，嗯……",
                 "如果说不后悔那肯定是骗人的。",
                 "又是白忙一场，还淋成了落汤鸡……"
+            ],
+            TraditionalChinese: [
+                "哼？啊，嗯……",
+                "如果說不後悔那肯定是騙人的。",
+                "又是白忙一場，還淋成了落湯雞……"
+            ],
+            Korean: [
+                "오, 음...",
+                "내가 좌절하지 않았다고 한다면 거짓말할 겁니다.",
+                "그 모든 노력이 헛되이 됐고 이제 난 익사한 쥐처럼..."
             ]
         }
     },
@@ -107,6 +145,14 @@ const AUDIO_DETAIL = [
             Chinese: [
                 "不过，果然应验了占卜。因为有搭档在身边，所以过了一天愉快的日子。",
                 "……多亏了老师的帮助啊。"
+            ],
+            TraditionalChinese: [
+                "不過，果然應驗了占卜。因為有搭檔在身邊，所以過了一天愉快的日子。",
+                "全部，都多虧了老師。"
+            ],
+            Korean: [
+                "하지만 운명이 말했듯이 제 친구가 제 옆에 있었기 때문에 좋은 날이었습니다.",
+                "모두, 선생님의 덕분입니다."
             ]
         }
     },
@@ -129,6 +175,18 @@ const AUDIO_DETAIL = [
                 "我挺幸福的。",
                 "啊，不对，是说，能这样一起避雨，真是幸运，很幸福！",
                 "就……只是这样而已……。"
+            ],
+            TraditionalChinese: [
+                "所以，說起來——",
+                "我挺幸福的。",
+                "啊，不對，是說，能這樣一起避雨，真是幸運，很幸福！",
+                "就……只是這樣而已……。"
+            ],
+            Korean: [
+                "그래서, 어떤 경우에도 ⁇",
+                "난 행복해",
+                "난 운이 좋고 행복한데 비가 내리지 않는 곳을 찾았어",
+                "그게 전부야..."
             ]
         }
     }
@@ -319,7 +377,8 @@ function drawHitboxes() {
 		n = (n / transpose) - (d[side].length / (transpose * 2));
 		n = n * customScale + (d[side].length / (transpose * 2));
 		n = (d[side].length / (transpose * 2)) - n;
-		return d[side].mid - n;
+		const offset = side === 'x' ? canvas.width * positionX : canvas.height * positionY;
+		return d[side].mid - n + offset;
 	}
 
 	for (const key in HITBOX) {
@@ -412,12 +471,45 @@ function setMouse(event) {
 		ax = canvas.width - ax;
 	}
 
-	return { x: ax, y: ay }
+	return { x: ax - canvas.width * positionX, y: ay - canvas.height * positionY };
+}
+
+function updateSubtitleLanguage() {
+	let language = subtitleLanguagePreference;
+	if (language === 'auto') {
+		const locale = interfaceLanguage === 'default' ? steamLanguage : interfaceLanguage;
+		const [primary, region] = locale.split(/[-_]/);
+		if (primary === 'tchinese' || (primary === 'zh' && ['cht', 'hant', 'tw', 'hk', 'mo'].includes(region))) {
+			language = 'TraditionalChinese';
+		} else if (primary === 'schinese' || primary === 'zh') {
+			language = 'Chinese';
+		} else if (primary === 'ja' || primary === 'japanese') {
+			language = 'Japanese';
+		} else if (primary === 'ko' || primary === 'korean' || primary === 'koreana') {
+			language = 'Korean';
+		} else {
+			language = 'English';
+		}
+	}
+
+	if (language === window.selectedLanguage) return;
+	window.selectedLanguage = language;
+	textbox.lang = subtitleLocales[language];
+	const clip = currentTracks.at(-1);
+	if (dialogBox && clip) textbox.textContent = clip.dialog[language][clip.index];
 }
 
 function init() {
 	// Wallpaper Engine settings
 	window.wallpaperPropertyListener = {
+		applyGeneralProperties: (props) => {
+			const language = props.language?.value ?? props.language;
+			const steamLocale = props.steamlanguage?.value ?? props.steamlanguage;
+			if (typeof language !== 'string' && typeof steamLocale !== 'string') return;
+			if (typeof language === 'string') interfaceLanguage = language.toLowerCase();
+			if (typeof steamLocale === 'string') steamLanguage = steamLocale.toLowerCase();
+			updateSubtitleLanguage();
+		},
 		applyUserProperties: (props) => {
 			if (props.schemecolor) {
 				bufferColor = props.schemecolor.value.split(" ");
@@ -426,8 +518,16 @@ function init() {
 			if (props.scale) {
 				customScale = props.scale.value;
 				document.documentElement.style.setProperty('--wallpaper-scale', customScale);
-				resize();
 			}
+			if (props.positionx) {
+				positionX = props.positionx.value / 100;
+				document.documentElement.style.setProperty('--wallpaper-position-x', props.positionx.value + 'vw');
+			}
+			if (props.positiony) {
+				positionY = props.positiony.value / 100;
+				document.documentElement.style.setProperty('--wallpaper-position-y', props.positiony.value + 'vh');
+			}
+			if (props.scale || props.positionx || props.positiony) resize();
 			if (props.targetfps) targetFps = props.targetfps.value;
 
 			if (props.introanimation) introAnimation = props.introanimation.value;
@@ -462,18 +562,15 @@ function init() {
 
 			// 监听模型分辨率设置
 			if (props.modelresolution) modelResolution = props.modelresolution.value;
-			if (assetManager && typeof introAnimation !== 'undefined' && !modelFrame && loadingResolution !== modelResolution) {
+			if (assetManager && typeof introAnimation !== 'undefined' && !modelFrame &&
+				(props.modelresolution || loadingResolution !== modelResolution)) {
 				reloadModel();
 			}
 
-			// 新增：监听语言选择
 			if (props.dialoglanguage) {
-				window.selectedLanguage = props.dialoglanguage.value; // 更新全局语言变量
-				// 更新当前播放的音频文本
-				const clip = currentTracks[currentTracks.length - 1];
-				if (dialogBox && clip) {
-					textbox.textContent = clip.dialog[window.selectedLanguage][clip.index];
-				}
+				const language = props.dialoglanguage.value;
+				subtitleLanguagePreference = Object.hasOwn(subtitleLocales, language) ? language : 'auto';
+				updateSubtitleLanguage();
 			}
 
 			if (props.bgmfile) {
@@ -496,6 +593,7 @@ function init() {
 	};
 
 	textbox = document.getElementById('textbox');
+	textbox.lang = subtitleLocales[window.selectedLanguage];
 
 	canvas = document.getElementById('canvas');
 	canvas.addEventListener('mouseleave', releaseHeadpatOnExit);
@@ -526,6 +624,7 @@ function init() {
 		if (loadingResolution === undefined && !modelFrame) reloadModel();
 	}, 350);
 
+	window.addEventListener('resize', resize);
 	window.addEventListener('pagehide', event => {
 		if (event.persisted) return;
 		canvas.style.visibility = 'hidden';
@@ -626,6 +725,8 @@ function reloadModel() {
 
 // CITATION: http://esotericsoftware.com/spine-api-reference#
 // CITATION: http://en.esotericsoftware.com/forum/Spine-Unity-Making-the-arm-follow-the-mouse-7856
+let modelMouseHandlersBound = false;
+
 function interactionLoad() {
 	// Touch_Point and Touch_Eye
 	TPoint = spineData.skeleton.findBone('Touch_Point');
@@ -633,28 +734,31 @@ function interactionLoad() {
 	EPointX = TEye.x;
 	EPointY = TEye.y;
 
-	downaction = canvas.addEventListener('mousedown', function (event) {
-		if (isVoicelinePlaying || !acceptingClick) {
-			return;
-		}
-		acceptingClick = false;
-		let mouseData = setMouse(event);
-		pressedMouse(mouseData.x, mouseData.y);
-	});
-	upaction = canvas.addEventListener('mouseup', function () {
-		// Only call releasedMouse if there was a valid mousedown interaction
-		// (i.e., mouseSelect is not -1 or acceptingClick was set to false by pressedMouse)
-		if (mouseSelect !== -1) {
-			releasedMouse();
-		} else {
-			// Ensure acceptingClick is restored even if no interaction occurred
-			if (!headpatCooldown) acceptingClick = true;
-		}
-	});
-	moveaction = canvas.addEventListener('mousemove', function (event) {
-		let mouseData = setMouse(event);
-		movedMouse(mouseData.x, mouseData.y);
-	});
+	if (!modelMouseHandlersBound) {
+		modelMouseHandlersBound = true;
+		downaction = canvas.addEventListener('mousedown', function (event) {
+			if (isVoicelinePlaying || !acceptingClick) {
+				return;
+			}
+			acceptingClick = false;
+			let mouseData = setMouse(event);
+			pressedMouse(mouseData.x, mouseData.y);
+		});
+		upaction = canvas.addEventListener('mouseup', function () {
+			// Only call releasedMouse if there was a valid mousedown interaction
+			// (i.e., mouseSelect is not -1 or acceptingClick was set to false by pressedMouse)
+			if (mouseSelect !== -1) {
+				releasedMouse();
+			} else {
+				// Ensure acceptingClick is restored even if no interaction occurred
+				if (!headpatCooldown) acceptingClick = true;
+			}
+		});
+		moveaction = canvas.addEventListener('mousemove', function (event) {
+			let mouseData = setMouse(event);
+			movedMouse(mouseData.x, mouseData.y);
+		});
+	}
 
 	if (!introAnimation) {
 		acceptingClick = true;
@@ -831,9 +935,12 @@ function render() {
 function resize() {
 	let w = canvas.clientWidth;
 	let h = canvas.clientHeight;
+	if (w === 0 || h === 0) return;
 	if (canvas.width != w || canvas.height != h) {
 		canvas.width = w;
 		canvas.height = h;
+		overlay.width = w;
+		overlay.height = h;
 	}
 
 	// Set values to position skeleton to center of canvas.
@@ -859,7 +966,7 @@ function resize() {
 		transpose = 1600 / canvas.height;
 	}
 
-	mvp.ortho2d(centerX - width / 2, centerY - height / 2, width, height);
+	mvp.ortho2d(centerX - width / 2 - positionX * width, centerY - height / 2 + positionY * height, width, height);
 	gl.viewport(0, 0, canvas.width, canvas.height);
 }
 
