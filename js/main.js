@@ -44,7 +44,8 @@ const subtitleLocales = {
 	Chinese: 'zh-Hans',
 	TraditionalChinese: 'zh-Hant',
 	Japanese: 'ja',
-	Korean: 'ko'
+	Korean: 'ko',
+	Thai: 'th'
 };
 let isVoicelinePlaying = false;
 
@@ -62,21 +63,22 @@ const AUDIO_DETAIL = [
                 "うぅ……さっむ。"
             ],
             English: [
-                "Ahh, I'm soaking wet...",
-                "Ugh... so cold."
+                "Ah, ah, I'm soaked.",
+                "Ugh... I'm cold."
             ],
             Chinese: [
                 "啊啊，浑身湿透了……",
                 "呜……好冷。"
             ],
             TraditionalChinese: [
-                "啊啊，渾身溼透了……",
-                "嗚……好冷。"
+                "啊～啊，全都濕了……",
+                "嗚嗚……好冷。"
             ],
             Korean: [
-                "아, 젖어있어요...",
-                "너무 추워요"
-            ]
+                "아-아, 쫄딱 젖었네.",
+                "으으…… 추워."
+            ],
+            Thai: ["อ่า เปียกโชกเลย","อึก... หนาวจัง"]
         }
     },
     {
@@ -86,21 +88,22 @@ const AUDIO_DETAIL = [
                 "まぁ、頭を冷やすにはちょうどよかったっすかね。"
             ],
             English: [
-                "It really started pouring, didn't it? And they say it won't stop until tonight... *sigh*...",
-                "Well, I guess it was a good way to cool off my head."
+                "It's really coming down. Apparently, it's not going to stop until later tonight. *sigh*",
+                "Well, I guess it's nice to take a beat and regroup."
             ],
             Chinese: [
                 "开始下雨了。好像会下一晚……唉……",
                 "不过，倒是正好让脑袋冷静下来了呢。"
             ],
             TraditionalChinese: [
-                "開始下雨了。好像會下一晚……唉……",
-                "不過，倒是正好讓腦袋冷靜下來了呢。"
+                "開始下雨了呢。聽說到晚上都不會停……唉……",
+                "算了，正好可以讓腦袋冷靜一下。"
             ],
             Korean: [
-                "정말 비가 내리기 시작했는데 오늘 밤까지만 멈추지 않을 거라고요",
-                "제 머릿속을 차분하게 하는 좋은 방법인 것 같아요"
-            ]
+                "비, 결국 내리기 시작했네요. 밤까지 안 그칠 거라던데…… 하아…….",
+                "뭐, 머리도 식히고 마침 좋슴다."
+            ],
+            Thai: ["ฝนตกลงมาจนได้นะคะ เห็นว่าจะตกถึงกลางคืนเลยด้วย... เฮ้อ...","แต่มันก็ทำให้สมองโล่งดีนะคะ"]
         }
     },
     {
@@ -111,9 +114,9 @@ const AUDIO_DETAIL = [
                 "いろいろ無駄骨になるわ、濡れ鼠になるわ……。"
             ],
             English: [
-                "Huh? Oh, well...",
-                "I'd be lying if I said I wasn't frustrated.",
-                "All that effort went to waste, and now I'm like a drowned rat..."
+                "Hm? Ah, well...",
+                "I'd be lying if I said I wasn't disappointed.",
+                "I wasted my time, and I'm drenched..."
             ],
             Chinese: [
                 "哼？啊，嗯……",
@@ -121,15 +124,16 @@ const AUDIO_DETAIL = [
                 "又是白忙一场，还淋成了落汤鸡……"
             ],
             TraditionalChinese: [
-                "哼？啊，嗯……",
-                "如果說不後悔那肯定是騙人的。",
-                "又是白忙一場，還淋成了落湯雞……"
+                "咦？啊啊，唔嗯……",
+                "要說沒有不甘心的話，那是騙人的。",
+                "不只白費很多功夫，還被淋成落湯雞……"
             ],
             Korean: [
-                "오, 음...",
-                "내가 좌절하지 않았다고 한다면 거짓말할 겁니다.",
-                "그 모든 노력이 헛되이 됐고 이제 난 익사한 쥐처럼..."
-            ]
+                "네? 아아, 으음-",
+                "속상하지 않았다면, 거짓말임다.",
+                "이것저것 허탕 쳤고, 쫄딱 젖어버렸고……."
+            ],
+            Thai: ["คะ? อ่า อืม","ถ้าบอกว่าไม่ผิดหวัง ก็คงเป็นเรื่องโกหกค่ะ","ทุกอย่างเปล่าประโยชน์ แล้วฉันก็เปียกโชกไปหมดด้วย..."]
         }
     },
     {
@@ -139,21 +143,22 @@ const AUDIO_DETAIL = [
                 "……先生のおかげっすよ。"
             ],
             English: [
-                "But, it's just like the fortune said. Because my buddy was by my side, it turned into a great day.",
-                "...It's all thanks to you, Sensei."
+                "But still, today went just like my horoscope said it would. It ended up being a nice day with a buddy by my side.",
+                "...It's all thanks to you."
             ],
             Chinese: [
                 "不过，果然应验了占卜。因为有搭档在身边，所以过了一天愉快的日子。",
                 "……多亏了老师的帮助啊。"
             ],
             TraditionalChinese: [
-                "不過，果然應驗了占卜。因為有搭檔在身邊，所以過了一天愉快的日子。",
-                "全部，都多虧了老師。"
+                "但是，就和占卜說的一樣。因為有夥伴在身邊，所以是個美好的一天。",
+                "……這都是多虧了老師哦。"
             ],
             Korean: [
-                "하지만 운명이 말했듯이 제 친구가 제 옆에 있었기 때문에 좋은 날이었습니다.",
-                "모두, 선생님의 덕분입니다."
-            ]
+                "그래도, 운세대로 됐슴다. 버디가 옆에 있으니, 좋은 하루가 됐네요.",
+                "……선생님 덕분임다."
+            ],
+            Thai: ["แต่มันก็เป็นไปตามดวงนะคะ พอมีบัดดี้อยู่ข้างๆ ก็เลยเป็นวันที่ดีค่ะ","ต้องขอบคุณคุณครูนะคะ..."]
         }
     },
     {
@@ -165,10 +170,10 @@ const AUDIO_DETAIL = [
                 "そ、それだけ……っすから……。"
             ],
             English: [
-                "So, if anything—",
+                "So, if I had to say...",
                 "I'm happy.",
-                "...Ah, wait, no! I mean, I'm lucky and happy because we found a place to shelter from the rain!",
-                "Th-That's... all I meant by it..."
+                "...Ah, wait, I mean! It was really lucky that we found shelter from the rain so quickly! That's why I'm happy!",
+                "Th-That was the...gist of it..."
             ],
             Chinese: [
                 "所以，说起来——",
@@ -177,17 +182,18 @@ const AUDIO_DETAIL = [
                 "就……只是这样而已……。"
             ],
             TraditionalChinese: [
-                "所以，說起來——",
-                "我挺幸福的。",
-                "啊，不對，是說，能這樣一起避雨，真是幸運，很幸福！",
-                "就……只是這樣而已……。"
+                "所以，如果真要說的話──",
+                "我很幸福。",
+                "……啊，不是，那個！我的意思是能像這樣有地方躲雨真是既幸運又幸福！",
+                "就，就只是這樣……而已……"
             ],
             Korean: [
-                "그러니까, 굳이 따지자면—",
-                "난 행복해",
-                "난 운이 좋고 행복한데 비가 내리지 않는 곳을 찾았어",
-                "그게 전부야..."
-            ]
+                "그러니, 어느 쪽이냐면-",
+                "행복합니다.",
+                "……앗 아뇨, 그! 이렇게 비 피할 곳도 있어서 럭키-! 그래서 행복하구나- 라는 의미에서!",
+                "그, 그런 거…… 임다……."
+            ],
+            Thai: ["เพราะงั้นถ้าถามว่ารู้สึกยังไงละก็...","ฉันมีความสุขค่ะ","อ๊ะ... ไม่สิคะ คือว่า! มีที่ให้มาหลบฝนแบบนี้ด้วย ลักกี้! ฉันก็เลยมีความสุข ฉันจะสื่อแบบนี้น่ะ!","กะ... ก็ประมาณนี้...น่ะค่ะ..."]
         }
     }
 ];
@@ -299,7 +305,7 @@ function playVoiceline() {
 			track.play().catch(finish);
 
 			if (dialogBox) {
-				textbox.textContent = dialog[window.selectedLanguage][index];
+				textbox.textContent = getSubtitleText(dialog, window.selectedLanguage, index);
 				textbox.style.opacity = 1;
 			}
 		},
@@ -474,6 +480,16 @@ function setMouse(event) {
 	return { x: ax - canvas.width * positionX, y: ay - canvas.height * positionY };
 }
 
+function getSubtitleText(dialog, language, index) {
+	let text = dialog?.[language]?.[index];
+	if (text == null && language === 'Thai') {
+		language = 'English';
+		text = dialog?.[language]?.[index];
+	}
+	textbox.lang = subtitleLocales[language];
+	return text ?? "";
+}
+
 function updateSubtitleLanguage() {
 	let language = subtitleLanguagePreference;
 	if (language === 'auto') {
@@ -487,6 +503,8 @@ function updateSubtitleLanguage() {
 			language = 'Japanese';
 		} else if (primary === 'ko' || primary === 'korean' || primary === 'koreana') {
 			language = 'Korean';
+		} else if (primary === 'th' || primary === 'thai') {
+			language = 'Thai';
 		} else {
 			language = 'English';
 		}
@@ -496,7 +514,7 @@ function updateSubtitleLanguage() {
 	window.selectedLanguage = language;
 	textbox.lang = subtitleLocales[language];
 	const clip = currentTracks.at(-1);
-	if (dialogBox && clip) textbox.textContent = clip.dialog[language][clip.index];
+	if (dialogBox && clip) textbox.textContent = getSubtitleText(clip.dialog, language, clip.index);
 }
 
 function init() {
